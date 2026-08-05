@@ -1,0 +1,25 @@
+{
+  "name": "@my-py-agents/website",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ag-ui/client": "catalog:",
+    "@aws-sdk/credential-provider-cognito-identity": "catalog:",
+    "@copilotkit/react-core": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@tanstack/react-query-devtools": "catalog:",
+    "@tanstack/react-router": "catalog:",
+    "aws4fetch": "catalog:",
+    "lucide-react": "catalog:",
+    "oidc-client-ts": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-oidc-context": "catalog:",
+    "tailwindcss": "catalog:",
+    "@my-py-agents/common-shadcn": "workspace:*"
+  },
+  "devDependencies": {
+    "@smithy/types": "catalog:"
+  }
+}

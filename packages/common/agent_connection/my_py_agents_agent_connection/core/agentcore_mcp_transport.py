@@ -1,0 +1,28 @@
+from collections.abc import Callable
+
+from .agentcore_endpoints import mcp_url_from_arn, region_from_arn
+from .agentcore_transport import (
+    TransportFactory,
+    jwt_transport,
+    no_auth_transport,
+    sigv4_transport,
+)
+
+
+class AgentCoreMCPTransport:
+    """Factory for MCP transport factories that connect to an AgentCore runtime."""
+
+    @staticmethod
+    def with_iam_auth(agent_runtime_arn: str) -> TransportFactory:
+        """SigV4-authenticated transport for a Bedrock AgentCore runtime."""
+        return sigv4_transport(mcp_url_from_arn(agent_runtime_arn), region_from_arn(agent_runtime_arn))
+
+    @staticmethod
+    def with_jwt_auth(agent_runtime_arn: str, access_token_provider: Callable[[], str]) -> TransportFactory:
+        """Bearer-authenticated transport for a Bedrock AgentCore runtime."""
+        return jwt_transport(mcp_url_from_arn(agent_runtime_arn), access_token_provider)
+
+    @staticmethod
+    def without_auth(url: str) -> TransportFactory:
+        """Plain-HTTP transport — for local dev."""
+        return no_auth_transport(url)

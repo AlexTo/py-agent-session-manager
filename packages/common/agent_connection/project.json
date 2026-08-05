@@ -1,0 +1,135 @@
+{
+  "name": "my_py_agents.agent_connection",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "packages/common/agent_connection/my_py_agents_agent_connection",
+  "release": {
+    "version": {
+      "versionActions": "@nxlv/python/release/version-actions"
+    }
+  },
+  "tags": [],
+  "metadata": {
+    "generator": "py#project"
+  },
+  "targets": {
+    "add": {
+      "executor": "@nxlv/python:add",
+      "options": {}
+    },
+    "build": {
+      "inputs": ["default", "^production"],
+      "dependsOn": ["lint", "compile", "test", "typecheck"],
+      "options": {
+        "outputPath": "{workspaceRoot}/dist/{projectRoot}"
+      }
+    },
+    "compile": {
+      "executor": "@nxlv/python:build",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/build"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "options": {
+        "outputPath": "{workspaceRoot}/dist/{projectRoot}/build",
+        "publish": false,
+        "lockedVersions": true,
+        "bundleLocalDependencies": true,
+        "ignorePaths": [
+          ".venv",
+          ".tox",
+          "tests",
+          "__pycache__",
+          ".coverage",
+          ".coverage.*",
+          ".pytest_cache",
+          "pytest-cache-files-*",
+          ".ruff_cache"
+        ]
+      }
+    },
+    "format": {
+      "executor": "@nxlv/python:ruff-format",
+      "outputs": [],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "options": {
+        "filePatterns": ["my_py_agents_agent_connection", "tests"],
+        "check": true
+      },
+      "configurations": {
+        "fix": {
+          "check": false
+        },
+        "skip-lint": {
+          "check": false
+        }
+      }
+    },
+    "install": {
+      "executor": "@nxlv/python:install",
+      "options": {
+        "silent": false,
+        "args": "",
+        "verbose": false,
+        "debug": false
+      }
+    },
+    "lint": {
+      "executor": "@nxlv/python:ruff-check",
+      "dependsOn": ["format"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [],
+      "options": {
+        "lintFilePatterns": ["my_py_agents_agent_connection", "tests"]
+      },
+      "configurations": {
+        "fix": {
+          "fix": true
+        },
+        "skip-lint": {
+          "exitZero": true
+        }
+      }
+    },
+    "lock": {
+      "executor": "@nxlv/python:lock",
+      "options": {
+        "update": false
+      }
+    },
+    "remove": {
+      "executor": "@nxlv/python:remove",
+      "options": {}
+    },
+    "sync": {
+      "executor": "@nxlv/python:sync",
+      "options": {}
+    },
+    "test": {
+      "executor": "@nxlv/python:run-commands",
+      "outputs": [
+        "{workspaceRoot}/reports/{projectRoot}/unittests",
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "cache": true,
+      "options": {
+        "command": "uv run pytest tests/",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "executor": "@nxlv/python:run-commands",
+      "options": {
+        "command": "uv run ty check",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "update": {
+      "executor": "@nxlv/python:update",
+      "options": {}
+    }
+  }
+}

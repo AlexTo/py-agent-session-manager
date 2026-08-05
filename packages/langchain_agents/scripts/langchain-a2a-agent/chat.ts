@@ -1,0 +1,33 @@
+// Chat CLI for LangchainA2aAgent (A2A protocol). Connects to the local
+// `dev` server, or the deployed agent when `RUNTIME_CONFIG_APP_ID` is set.
+import {
+  ClientFactory,
+  ClientFactoryOptions,
+  DefaultAgentCardResolver,
+  JsonRpcTransportFactory,
+} from '@a2a-js/sdk/client';
+import { A2AChatAdapter, chatLoop } from 'agent-chat-cli';
+import { createAgentCoreFetch, resolveRemoteAgent } from './agentcore.js';
+
+const remote = await resolveRemoteAgent();
+
+const url = remote
+  ? `https://bedrock-agentcore.${remote.region}.amazonaws.com/runtimes/${encodeURIComponent(remote.arn)}/invocations/`
+  : process.env.URL!;
+
+// Remote requests are authenticated via a custom fetch; locally the default client talks plain HTTP.
+const clientFactory = remote
+  ? new ClientFactory({
+      ...ClientFactoryOptions.default,
+      transports: [
+        new JsonRpcTransportFactory({
+          fetchImpl: createAgentCoreFetch(remote.region),
+        }),
+      ],
+      cardResolver: new DefaultAgentCardResolver({
+        fetchImpl: createAgentCoreFetch(remote.region),
+      }),
+    })
+  : undefined;
+
+await chatLoop(new A2AChatAdapter({ clientFactory }), url);

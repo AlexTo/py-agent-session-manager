@@ -1,0 +1,14 @@
+FROM public.ecr.aws/docker/library/python:3.14-slim
+
+WORKDIR /app
+
+# Copy bundled package
+COPY . /app
+
+EXPOSE 8000
+
+ENV PYTHONPATH=/app
+
+# Auto-instrument with AWS Distro for OpenTelemetry
+# https://aws-otel.github.io/docs/getting-started/python-sdk/auto-instr
+CMD ["python", "bin/opentelemetry-instrument", "python", "-m", "uvicorn", "my_py_agents_langchain_agents.mcp_server.http:app", "--host", "0.0.0.0", "--port", "8000"]

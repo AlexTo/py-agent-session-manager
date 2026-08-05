@@ -1,0 +1,211 @@
+{
+  "name": "@my-py-agents/website",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/website/src",
+  "projectType": "application",
+  "tags": [],
+  "metadata": {
+    "generator": "ts#react-website",
+    "ux": "shadcn",
+    "framework": "react",
+    "infra": "cloudfront-s3",
+    "tailwind": true,
+    "tanstackRouter": true,
+    "iac": "cdk",
+    "components": [
+      {
+        "generator": "ts#react-website#runtime-config",
+        "path": "src/components/RuntimeConfig"
+      },
+      {
+        "generator": "ts#react-website#auth",
+        "path": "src/components/CognitoAuth",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#agent#react-connection",
+        "path": "src/hooks/useAguiStrandsAguiAgent",
+        "name": "StrandsAguiAgent",
+        "protocol": "ag-ui",
+        "auth": "iam",
+        "theme": "shadcn"
+      },
+      {
+        "generator": "py#agent#react-connection",
+        "path": "src/components/StrandsHttpAgentProvider",
+        "name": "StrandsHttpAgent",
+        "protocol": "http",
+        "auth": "iam",
+        "theme": "shadcn"
+      },
+      {
+        "generator": "py#agent#react-connection",
+        "path": "src/hooks/useAguiLangchainAguiAgent",
+        "name": "LangchainAguiAgent",
+        "protocol": "ag-ui",
+        "auth": "iam",
+        "theme": "shadcn"
+      },
+      {
+        "generator": "py#agent#react-connection",
+        "path": "src/components/LangchainHttpAgentProvider",
+        "name": "LangchainHttpAgent",
+        "protocol": "http",
+        "auth": "iam",
+        "theme": "shadcn"
+      }
+    ]
+  },
+  "targets": {
+    "build": {
+      "dependsOn": ["lint", "compile", "test", "bundle"]
+    },
+    "bundle": {
+      "dependsOn": [
+        "generate:strands-http-agent-client",
+        "generate:langchain-http-agent-client"
+      ]
+    },
+    "compile": {
+      "dependsOn": [
+        "^build",
+        "generate:strands-http-agent-client",
+        "generate:langchain-http-agent-client"
+      ],
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/tsc"],
+      "options": {
+        "command": "tsc --build tsconfig.app.json",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["my_py_agents.strands_agents"],
+          "target": "strands-agui-agent-dev"
+        },
+        {
+          "projects": ["my_py_agents.strands_agents"],
+          "target": "strands-http-agent-dev"
+        },
+        "generate:strands-http-agent-client",
+        "watch-generate:strands-http-agent-client",
+        {
+          "projects": ["my_py_agents.langchain_agents"],
+          "target": "langchain-agui-agent-dev"
+        },
+        {
+          "projects": ["my_py_agents.langchain_agents"],
+          "target": "langchain-http-agent-dev"
+        },
+        "generate:langchain-http-agent-client",
+        "watch-generate:langchain-http-agent-client"
+      ],
+      "continuous": true,
+      "options": {
+        "command": "vite --mode local-dev",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["biome"],
+      "options": {
+        "command": "biome format {projectRoot}"
+      },
+      "configurations": {
+        "fix": {
+          "command": "biome format --write {projectRoot}"
+        },
+        "skip-lint": {
+          "command": "node -e \"\""
+        }
+      }
+    },
+    "generate:langchain-http-agent-client": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "inputs": [
+        {
+          "dependentTasksOutputFiles": "**/*.json"
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/packages/website/src/generated/langchain-http-agent"
+      ],
+      "dependsOn": [
+        "my_py_agents.langchain_agents:langchain-http-agent-openapi"
+      ],
+      "options": {
+        "commands": [
+          "nx g @aws/nx-plugin:open-api#ts-hooks --openApiSpecPath=\"dist/packages/langchain_agents/openapi/langchain_http_agent/openapi.json\" --outputPath=\"packages/website/src/generated/langchain-http-agent\" --no-interactive"
+        ]
+      }
+    },
+    "generate:strands-http-agent-client": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "inputs": [
+        {
+          "dependentTasksOutputFiles": "**/*.json"
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/packages/website/src/generated/strands-http-agent"
+      ],
+      "dependsOn": ["my_py_agents.strands_agents:strands-http-agent-openapi"],
+      "options": {
+        "commands": [
+          "nx g @aws/nx-plugin:open-api#ts-hooks --openApiSpecPath=\"dist/packages/strands_agents/openapi/strands_http_agent/openapi.json\" --outputPath=\"packages/website/src/generated/strands-http-agent\" --no-interactive"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["biome"],
+      "dependsOn": ["format"],
+      "options": {
+        "command": "biome lint {projectRoot}"
+      },
+      "configurations": {
+        "fix": {
+          "command": "biome check --write {projectRoot}"
+        },
+        "skip-lint": {
+          "command": "node -e \"\""
+        }
+      }
+    },
+    "load:runtime-config": {
+      "executor": "nx:run-commands",
+      "metadata": {
+        "description": "Load runtime config from your deployed stack for dev purposes. You must set your AWS CLI credentials whilst calling 'pnpm nx run @my-py-agents/website:load:runtime-config'"
+      },
+      "options": {
+        "command": "aws s3 cp s3://`aws cloudformation describe-stacks --query \"Stacks[?starts_with(StackName, 'my-py-agents-')][].Outputs[] | [?contains(OutputKey, 'WebsiteWebsiteBucketName')].OutputValue\" --output text`/runtime-config.json \"{projectRoot}/public/runtime-config.json\""
+      }
+    },
+    "watch-generate:langchain-http-agent-client": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "nx watch --projects=my_py_agents.langchain_agents --includeDependencies -- nx run @my-py-agents/website:\"generate:langchain-http-agent-client\""
+        ]
+      }
+    },
+    "watch-generate:strands-http-agent-client": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "nx watch --projects=my_py_agents.strands_agents --includeDependencies -- nx run @my-py-agents/website:\"generate:strands-http-agent-client\""
+        ]
+      }
+    }
+  }
+}

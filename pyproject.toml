@@ -1,0 +1,35 @@
+[project]
+name = "nx-workspace"
+version = "1.0.0"
+dependencies = [
+  "my-py-agents-agent-connection",
+  "my-py-agents-langchain-agents",
+  "my-py-agents-strands-agents"
+]
+
+[tool.uv.workspace]
+members = [
+  "packages/common/agent_connection",
+  "packages/langchain_agents",
+  "packages/strands_agents"
+]
+
+[tool.uv.sources.my-py-agents-agent-connection]
+workspace = true
+
+[tool.uv.sources.my-py-agents-langchain-agents]
+workspace = true
+
+[tool.uv.sources.my-py-agents-strands-agents]
+workspace = true
+
+[dependency-groups]
+dev = [
+  "ruff==0.15.22",
+  "autopep8>=2.3.1",
+  "pytest>=8.3.4",
+  "pytest-sugar>=1.0.0",
+  "pytest-cov>=6.0.0",
+  "pytest-html>=4.1.1",
+  "ty==0.0.61"
+]
