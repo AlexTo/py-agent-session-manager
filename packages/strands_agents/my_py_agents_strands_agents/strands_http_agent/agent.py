@@ -4,9 +4,12 @@ from my_py_agents_agent_connection import (
     StrandsA2aAgentClientStrands,
     StrandsAgentsMcpServerClientStrands,
     log_model_errors,
+    log_tool_errors,
 )
 from strands import Agent, tool
 from strands_tools import current_time
+
+from .session import get_session_manager
 
 
 @tool
@@ -28,6 +31,7 @@ def get_agent():
             return str(strands_a2a_agent(prompt))
 
         yield Agent(
+            session_manager=get_session_manager(),
             name="StrandsHttpAgent",
             description="StrandsHttpAgent Strands Agent",
             system_prompt="""
@@ -36,5 +40,5 @@ Use your tools for mathematical tasks.
 Refer to tools as your 'spellbook'.
 """,
             tools=[subtract, current_time, ask_strands_a2a_agent, *strands_agents_mcp_server.list_tools_sync()],
-            hooks=[log_model_errors],
+            hooks=[log_model_errors, log_tool_errors],
         )

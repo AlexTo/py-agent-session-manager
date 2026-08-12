@@ -1,5 +1,6 @@
 import logging
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI
@@ -7,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from starlette.middleware.exceptions import ExceptionMiddleware
+
+from .agent import get_agent
 
 
 class InternalServerErrorDetails(BaseModel):
@@ -60,10 +63,17 @@ class JsonStreamingResponse(StreamingResponse):
         }
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.graph = get_agent()
+    yield
+
+
 app = FastAPI(
     title="LangchainHttpAgent",
     responses={500: {"model": InternalServerErrorDetails}},
     generate_unique_id_function=lambda route: route.name,
+    lifespan=lifespan,
 )
 
 # Add cors middleware

@@ -1,6 +1,7 @@
 import logging
 import os
 import uuid
+from contextlib import asynccontextmanager
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.apps import A2AStarletteApplication
@@ -22,7 +23,11 @@ RUNTIME_URL = os.environ.get("AGENTCORE_RUNTIME_URL", f"http://localhost:{PORT}/
 SESSION_ID_HEADER = "x-amzn-bedrock-agentcore-runtime-session-id"
 DEFAULT_MODES = ["text/plain"]
 
-_graph = get_agent()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.agent = get_agent()
+    yield
 
 
 class _GraphAgentExecutor(AgentExecutor):
@@ -36,7 +41,7 @@ class _GraphAgentExecutor(AgentExecutor):
         # The session bound by the middleware drives the LangGraph thread, keeping
         # checkpointed conversation state separate per caller session.
         session_id = get_current_session_id() or task.context_id
-        result = await _graph.ainvoke(
+        result = await app.state.agent.ainvoke(
             {"messages": [{"role": "user", "content": context.get_user_input()}]},
             {"configurable": {"thread_id": session_id}},
         )
@@ -76,7 +81,7 @@ class _SessionIdMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
 
-app = FastAPI(title="LangchainA2aAgent")
+app = FastAPI(title="LangchainA2aAgent", lifespan=lifespan)
 app.add_middleware(_SessionIdMiddleware)
 
 

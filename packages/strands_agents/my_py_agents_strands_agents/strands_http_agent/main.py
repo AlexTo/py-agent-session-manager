@@ -3,21 +3,13 @@ import uuid
 import uvicorn
 from bedrock_agentcore.runtime.models import PingStatus
 from fastapi import Request
-from my_py_agents_agent_connection import session_id_context, with_session_id
+from my_py_agents_agent_connection import session_id_context
 from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from .agent import get_agent
 from .init import JsonStreamingResponse, app
 
 SESSION_ID_HEADER = "x-amzn-bedrock-agentcore-runtime-session-id"
-
-_agent_ctx = with_session_id(
-    get_agent,
-    name="StrandsHttpAgent",
-    description="A Strands Agent exposed via HTTP streaming.",
-)
-_agent = _agent_ctx.__enter__()
 
 
 class InvokeInput(BaseModel):
@@ -30,7 +22,7 @@ class StreamChunk(BaseModel):
 
 async def handle_invoke(input: InvokeInput):
     """Streaming handler for agent invocation"""
-    stream = _agent.stream_async(input.prompt)
+    stream = app.state.agent.stream_async(input.prompt)
     async for event in stream:
         text = event.get("event", {}).get("contentBlockDelta", {}).get("delta", {}).get("text")
         if text is not None:

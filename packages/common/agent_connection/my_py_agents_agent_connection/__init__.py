@@ -6,6 +6,7 @@ from .app.strands_a2a_agent_client_strands import StrandsA2aAgentClientStrands
 from .app.strands_agents_mcp_server_client_strands import StrandsAgentsMcpServerClientStrands
 from .core.model_errors_strands import log_model_errors
 from .core.session_context import get_current_session_id, session_id_context
+from .core.tool_errors_strands import log_tool_errors
 from .core.with_session_id_strands import with_session_id
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "StrandsAgentsMcpServerClientStrands",
     "LangchainA2aAgentClientLangChain",
     "LangchainAgentsMcpServerClientLangChain",
+    "log_tool_errors",
 ]

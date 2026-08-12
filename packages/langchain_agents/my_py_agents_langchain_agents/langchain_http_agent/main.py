@@ -7,12 +7,9 @@ from my_py_agents_agent_connection import get_current_session_id, session_id_con
 from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from .agent import get_agent
 from .init import JsonStreamingResponse, app
 
 SESSION_ID_HEADER = "x-amzn-bedrock-agentcore-runtime-session-id"
-
-_graph = get_agent()
 
 
 class InvokeInput(BaseModel):
@@ -38,10 +35,8 @@ async def handle_invoke(input: InvokeInput, session_id: str):
     config = {"configurable": {"thread_id": session_id}}
     # Re-bind the session: the streaming body runs outside the middleware scope.
     with session_id_context(session_id):
-        stream = _graph.astream(
-            {"messages": [{"role": "user", "content": input.prompt}]},
-            config,
-            stream_mode="messages",
+        stream = app.state.graph.astream(
+            {"messages": [{"role": "user", "content": input.prompt}]}, config, stream_mode="messages"
         )
         async for message_chunk, _metadata in stream:
             text = _text(message_chunk.content)
