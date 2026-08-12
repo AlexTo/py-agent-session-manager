@@ -1,0 +1,28 @@
+{
+  "migrations": [
+    {
+      "cli": "nx",
+      "package": "@aws/nx-plugin",
+      "name": "v1.0.0-rc.61-0001-py-agent-lifespan-construction",
+      "version": "999.0.0",
+      "description": "0001-py-agent-lifespan-construction",
+      "implementation": "./src/migrations/v1.0.0-rc.61/0001-py-agent-lifespan-construction/migration"
+    },
+    {
+      "cli": "nx",
+      "package": "@aws/nx-plugin",
+      "name": "latest-py-agent-a2a-lifespan-construction",
+      "version": "999.0.0",
+      "description": "latest-py-agent-a2a-lifespan-construction",
+      "implementation": "./src/migrations/latest/latest-py-agent-a2a-lifespan-construction/migration"
+    },
+    {
+      "cli": "nx",
+      "package": "@aws/nx-plugin",
+      "name": "latest-py-agent-session-management-support",
+      "version": "999.0.0",
+      "description": "latest-py-agent-session-management-support",
+      "implementation": "./src/migrations/latest/latest-py-agent-session-management-support/migration"
+    }
+  ]
+}
