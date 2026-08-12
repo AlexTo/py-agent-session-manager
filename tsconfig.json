@@ -11,6 +11,12 @@
     },
     {
       "path": "./packages/common/shadcn"
+    },
+    {
+      "path": "./packages/strands-s3-website"
+    },
+    {
+      "path": "./packages/strands-s3-infra"
     }
   ]
 }

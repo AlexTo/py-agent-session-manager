@@ -15,7 +15,9 @@
         "test",
         "my_py_agents.strands_agents:build",
         "my_py_agents.langchain_agents:build",
-        "@my-py-agents/website:build"
+        "@my-py-agents/website:build",
+        "my_py_agents.strands_s3_agents:build",
+        "@my-py-agents/strands-s3-website:build"
       ]
     },
     "compile": {

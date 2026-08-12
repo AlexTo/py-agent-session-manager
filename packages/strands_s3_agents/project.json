@@ -1,0 +1,599 @@
+{
+  "name": "my_py_agents.strands_s3_agents",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "packages/strands_s3_agents/my_py_agents_strands_s3_agents",
+  "release": {
+    "version": {
+      "versionActions": "@nxlv/python/release/version-actions"
+    }
+  },
+  "tags": [],
+  "metadata": {
+    "generator": "py#project",
+    "ports": [8085, 9002, 8086, 8002],
+    "components": [
+      {
+        "generator": "py#agent",
+        "path": "my_py_agents_strands_s3_agents/strands_s3_http_agent",
+        "name": "strands-s3-http-agent",
+        "port": 8085,
+        "rc": "StrandsS3HttpAgent",
+        "auth": "iam",
+        "protocol": "http",
+        "framework": "strands",
+        "session": "s3",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#agent",
+        "path": "my_py_agents_strands_s3_agents/strands_s3_a2a_agent",
+        "name": "strands-s3-a2a-agent",
+        "port": 9002,
+        "rc": "StrandsS3A2aAgent",
+        "auth": "iam",
+        "protocol": "a2a",
+        "framework": "strands",
+        "session": "s3",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#agent",
+        "path": "my_py_agents_strands_s3_agents/strands_s3_agui_agent",
+        "name": "strands-s3-agui-agent",
+        "port": 8086,
+        "rc": "StrandsS3AguiAgent",
+        "auth": "iam",
+        "protocol": "ag-ui",
+        "framework": "strands",
+        "session": "s3",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#mcp-server",
+        "path": "my_py_agents_strands_s3_agents/strands_s3_mcp_server",
+        "name": "strands-s3-mcp-server",
+        "port": 8002,
+        "rc": "StrandsS3McpServer",
+        "auth": "iam",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#agent#a2a-connection",
+        "path": "my_py_agents_strands_s3_agents/strands_s3_agui_agent/agent.py",
+        "name": "StrandsS3A2aAgent",
+        "framework": "strands",
+        "sourcePath": "my_py_agents_strands_s3_agents/strands_s3_agui_agent"
+      },
+      {
+        "generator": "py#agent#mcp-connection",
+        "path": "my_py_agents_strands_s3_agents/strands_s3_http_agent/agent.py",
+        "name": "StrandsS3McpServer",
+        "framework": "strands",
+        "sourcePath": "my_py_agents_strands_s3_agents/strands_s3_http_agent"
+      }
+    ]
+  },
+  "targets": {
+    "add": {
+      "executor": "@nxlv/python:add",
+      "options": {}
+    },
+    "build": {
+      "dependsOn": ["lint", "compile", "test", "typecheck", "bundle", "docker"],
+      "inputs": ["default", "^production"],
+      "options": {
+        "outputPath": "{workspaceRoot}/dist/{projectRoot}"
+      }
+    },
+    "bundle": {
+      "dependsOn": ["bundle-arm"]
+    },
+    "bundle-arm": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["compile"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/bundle-arm"],
+      "options": {
+        "commands": [
+          "uv export --frozen --no-dev --no-editable --project {projectRoot} --package my_py_agents.strands_s3_agents -o dist/{projectRoot}/bundle-arm/requirements.txt",
+          "uv pip install -n --no-deps --no-installer-metadata --no-compile-bytecode --python-platform aarch64-manylinux_2_28 --target dist/{projectRoot}/bundle-arm -r dist/{projectRoot}/bundle-arm/requirements.txt"
+        ],
+        "parallel": false
+      }
+    },
+    "compile": {
+      "executor": "@nxlv/python:build",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/build"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "options": {
+        "outputPath": "{workspaceRoot}/dist/{projectRoot}/build",
+        "publish": false,
+        "lockedVersions": true,
+        "bundleLocalDependencies": true,
+        "ignorePaths": [
+          ".venv",
+          ".tox",
+          "tests",
+          "__pycache__",
+          ".coverage",
+          ".coverage.*",
+          ".pytest_cache",
+          "pytest-cache-files-*",
+          ".ruff_cache"
+        ]
+      }
+    },
+    "dev": {
+      "dependsOn": [
+        "strands-s3-http-agent-dev",
+        "strands-s3-a2a-agent-dev",
+        "strands-s3-agui-agent-dev",
+        "strands-s3-mcp-server-dev"
+      ],
+      "continuous": true
+    },
+    "docker": {
+      "dependsOn": [
+        "strands-s3-http-agent-docker",
+        "strands-s3-a2a-agent-docker",
+        "strands-s3-agui-agent-docker",
+        "strands-s3-mcp-server-docker"
+      ]
+    },
+    "format": {
+      "executor": "@nxlv/python:ruff-format",
+      "outputs": [],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "options": {
+        "filePatterns": ["my_py_agents_strands_s3_agents", "tests"],
+        "check": true
+      },
+      "configurations": {
+        "fix": {
+          "check": false
+        },
+        "skip-lint": {
+          "check": false
+        }
+      }
+    },
+    "install": {
+      "executor": "@nxlv/python:install",
+      "options": {
+        "silent": false,
+        "args": "",
+        "verbose": false,
+        "debug": false
+      }
+    },
+    "lint": {
+      "executor": "@nxlv/python:ruff-check",
+      "dependsOn": ["format"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [],
+      "options": {
+        "lintFilePatterns": ["my_py_agents_strands_s3_agents", "tests"]
+      },
+      "configurations": {
+        "fix": {
+          "fix": true
+        },
+        "skip-lint": {
+          "exitZero": true
+        }
+      }
+    },
+    "lock": {
+      "executor": "@nxlv/python:lock",
+      "options": {
+        "update": false
+      }
+    },
+    "remove": {
+      "executor": "@nxlv/python:remove",
+      "options": {}
+    },
+    "strands-s3-a2a-agent-chat": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["tsx ./scripts/strands-s3-a2a-agent/chat.ts"],
+        "cwd": "{projectRoot}",
+        "env": {
+          "URL": "http://localhost:9002"
+        }
+      }
+    },
+    "strands-s3-a2a-agent-dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["my_py_agents.strands_s3_agents"],
+          "target": "strands-s3-mcp-server-dev"
+        }
+      ],
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_strands_s3_agents/strands_s3_a2a_agent/main.py --port 9002"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "9002",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "strands-s3-a2a-agent-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/docker/strands-s3-a2a-agent",
+          "make-dir dist/packages/strands_s3_agents/docker/strands-s3-a2a-agent",
+          "ncp dist/packages/strands_s3_agents/bundle-arm dist/packages/strands_s3_agents/docker/strands-s3-a2a-agent",
+          "ncp packages/strands_s3_agents/my_py_agents_strands_s3_agents/strands_s3_a2a_agent/Dockerfile dist/packages/strands_s3_agents/docker/strands-s3-a2a-agent/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-strands-s3-a2a-agent:latest dist/packages/strands_s3_agents/docker/strands-s3-a2a-agent"
+        ],
+        "parallel": false
+      }
+    },
+    "strands-s3-a2a-agent-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_strands_s3_agents/strands_s3_a2a_agent/main.py --port 9002"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "9002"
+        }
+      }
+    },
+    "strands-s3-a2a-agent-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-a2a-agent-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["strands-s3-a2a-agent-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-a2a-agent-latest",
+          "make-dir dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-a2a-agent-latest",
+          "ncp packages/strands_s3_agents/.trivyignore dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-a2a-agent-latest/.trivyignore",
+          "docker save -o dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-a2a-agent-latest/image-0.tar my-py-agents-strands-s3-a2a-agent:latest",
+          "docker run --rm -v \"./dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-a2a-agent-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "strands-s3-agui-agent-chat": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["tsx ./scripts/strands-s3-agui-agent/chat.ts"],
+        "cwd": "{projectRoot}",
+        "env": {
+          "URL": "http://localhost:8086/invocations"
+        }
+      }
+    },
+    "strands-s3-agui-agent-dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["my_py_agents.strands_s3_agents"],
+          "target": "strands-s3-a2a-agent-dev"
+        },
+        {
+          "projects": ["my_py_agents.strands_s3_agents"],
+          "target": "strands-s3-mcp-server-dev"
+        }
+      ],
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_strands_s3_agents/strands_s3_agui_agent/main.py --port 8086"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8086",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "strands-s3-agui-agent-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/docker/strands-s3-agui-agent",
+          "make-dir dist/packages/strands_s3_agents/docker/strands-s3-agui-agent",
+          "ncp dist/packages/strands_s3_agents/bundle-arm dist/packages/strands_s3_agents/docker/strands-s3-agui-agent",
+          "ncp packages/strands_s3_agents/my_py_agents_strands_s3_agents/strands_s3_agui_agent/Dockerfile dist/packages/strands_s3_agents/docker/strands-s3-agui-agent/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-strands-s3-agui-agent:latest dist/packages/strands_s3_agents/docker/strands-s3-agui-agent"
+        ],
+        "parallel": false
+      }
+    },
+    "strands-s3-agui-agent-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_strands_s3_agents/strands_s3_agui_agent/main.py --port 8086"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8086"
+        }
+      }
+    },
+    "strands-s3-agui-agent-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-agui-agent-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["strands-s3-agui-agent-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-agui-agent-latest",
+          "make-dir dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-agui-agent-latest",
+          "ncp packages/strands_s3_agents/.trivyignore dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-agui-agent-latest/.trivyignore",
+          "docker save -o dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-agui-agent-latest/image-0.tar my-py-agents-strands-s3-agui-agent:latest",
+          "docker run --rm -v \"./dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-agui-agent-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "strands-s3-http-agent-chat": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["strands-s3-http-agent-generate-client"],
+      "options": {
+        "commands": ["tsx ./scripts/strands-s3-http-agent/chat.ts"],
+        "cwd": "{projectRoot}",
+        "env": {
+          "URL": "http://localhost:8085"
+        }
+      }
+    },
+    "strands-s3-http-agent-dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["my_py_agents.strands_s3_agents"],
+          "target": "strands-s3-a2a-agent-dev"
+        },
+        {
+          "projects": ["my_py_agents.strands_s3_agents"],
+          "target": "strands-s3-mcp-server-dev"
+        }
+      ],
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_strands_s3_agents/strands_s3_http_agent/main.py --port 8085"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8085",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "strands-s3-http-agent-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/docker/strands-s3-http-agent",
+          "make-dir dist/packages/strands_s3_agents/docker/strands-s3-http-agent",
+          "ncp dist/packages/strands_s3_agents/bundle-arm dist/packages/strands_s3_agents/docker/strands-s3-http-agent",
+          "ncp packages/strands_s3_agents/my_py_agents_strands_s3_agents/strands_s3_http_agent/Dockerfile dist/packages/strands_s3_agents/docker/strands-s3-http-agent/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-strands-s3-http-agent:latest dist/packages/strands_s3_agents/docker/strands-s3-http-agent"
+        ],
+        "parallel": false
+      }
+    },
+    "strands-s3-http-agent-generate-client": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["strands-s3-http-agent-openapi"],
+      "inputs": [
+        {
+          "dependentTasksOutputFiles": "**/*.json"
+        }
+      ],
+      "outputs": ["{projectRoot}/scripts/strands-s3-http-agent/generated"],
+      "options": {
+        "commands": [
+          "nx g @aws/nx-plugin:open-api#ts-client --openApiSpecPath=\"dist/packages/strands_s3_agents/openapi/strands_s3_http_agent/openapi.json\" --outputPath=\"packages/strands_s3_agents/scripts/strands-s3-http-agent/generated\" --no-interactive"
+        ]
+      }
+    },
+    "strands-s3-http-agent-openapi": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/dist/{projectRoot}/openapi/strands_s3_http_agent"
+      ],
+      "options": {
+        "commands": [
+          "uv run python {projectRoot}/scripts/strands_s3_http_agent_openapi.py \"dist/{projectRoot}/openapi/strands_s3_http_agent/openapi.json\""
+        ]
+      }
+    },
+    "strands-s3-http-agent-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_strands_s3_agents/strands_s3_http_agent/main.py --port 8085"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8085"
+        }
+      }
+    },
+    "strands-s3-http-agent-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-http-agent-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["strands-s3-http-agent-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-http-agent-latest",
+          "make-dir dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-http-agent-latest",
+          "ncp packages/strands_s3_agents/.trivyignore dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-http-agent-latest/.trivyignore",
+          "docker save -o dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-http-agent-latest/image-0.tar my-py-agents-strands-s3-http-agent:latest",
+          "docker run --rm -v \"./dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-http-agent-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "strands-s3-mcp-server-dev": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run uvicorn --reload my_py_agents_strands_s3_agents.strands_s3_mcp_server.http:app --host 0.0.0.0 --port 8002"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8002",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "strands-s3-mcp-server-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/docker/strands-s3-mcp-server",
+          "make-dir dist/packages/strands_s3_agents/docker/strands-s3-mcp-server",
+          "ncp dist/packages/strands_s3_agents/bundle-arm dist/packages/strands_s3_agents/docker/strands-s3-mcp-server",
+          "ncp packages/strands_s3_agents/my_py_agents_strands_s3_agents/strands_s3_mcp_server/Dockerfile dist/packages/strands_s3_agents/docker/strands-s3-mcp-server/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-strands-s3-mcp-server:latest dist/packages/strands_s3_agents/docker/strands-s3-mcp-server"
+        ],
+        "parallel": false
+      }
+    },
+    "strands-s3-mcp-server-inspect": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "dependsOn": ["strands-s3-mcp-server-dev"],
+      "options": {
+        "commands": [
+          "mcp-inspector --transport http --server-url http://localhost:8002/mcp"
+        ],
+        "cwd": "{projectRoot}"
+      }
+    },
+    "strands-s3-mcp-server-inspect-stdio": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "mcp-inspector -- uv run -m my_py_agents_strands_s3_agents.strands_s3_mcp_server.stdio"
+        ],
+        "cwd": "{projectRoot}"
+      }
+    },
+    "strands-s3-mcp-server-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run uvicorn --reload my_py_agents_strands_s3_agents.strands_s3_mcp_server.http:app --host 0.0.0.0 --port 8002"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8002"
+        }
+      }
+    },
+    "strands-s3-mcp-server-serve-stdio": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run -m my_py_agents_strands_s3_agents.strands_s3_mcp_server.stdio"
+        ],
+        "cwd": "{projectRoot}"
+      }
+    },
+    "strands-s3-mcp-server-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-mcp-server-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["strands-s3-mcp-server-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-mcp-server-latest",
+          "make-dir dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-mcp-server-latest",
+          "ncp packages/strands_s3_agents/.trivyignore dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-mcp-server-latest/.trivyignore",
+          "docker save -o dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-mcp-server-latest/image-0.tar my-py-agents-strands-s3-mcp-server:latest",
+          "docker run --rm -v \"./dist/packages/strands_s3_agents/trivy/my-py-agents-strands-s3-mcp-server-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "sync": {
+      "executor": "@nxlv/python:sync",
+      "options": {}
+    },
+    "test": {
+      "executor": "@nxlv/python:run-commands",
+      "outputs": [
+        "{workspaceRoot}/reports/{projectRoot}/unittests",
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "cache": true,
+      "options": {
+        "command": "uv run pytest tests/",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "trivy": {
+      "dependsOn": [
+        "strands-s3-http-agent-trivy",
+        "strands-s3-a2a-agent-trivy",
+        "strands-s3-agui-agent-trivy",
+        "strands-s3-mcp-server-trivy"
+      ]
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "executor": "@nxlv/python:run-commands",
+      "options": {
+        "command": "uv run ty check",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "update": {
+      "executor": "@nxlv/python:update",
+      "options": {}
+    }
+  }
+}

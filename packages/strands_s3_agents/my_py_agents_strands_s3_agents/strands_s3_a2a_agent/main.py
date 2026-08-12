@@ -1,0 +1,70 @@
+import logging
+import os
+import uuid
+from contextlib import asynccontextmanager
+from types import SimpleNamespace
+from typing import cast
+
+from fastapi import FastAPI, Request
+from my_py_agents_agent_connection import session_id_context, with_session_id
+from starlette.middleware.base import BaseHTTPMiddleware
+from strands import Agent
+from strands.multiagent.a2a import A2AServer
+
+from .agent import get_agent
+
+logging.basicConfig(level=logging.INFO)
+
+PORT = int(os.environ.get("PORT", "9000"))
+RUNTIME_URL = os.environ.get("AGENTCORE_RUNTIME_URL", f"http://localhost:{PORT}/")
+SESSION_ID_HEADER = "x-amzn-bedrock-agentcore-runtime-session-id"
+AGENT_NAME = "StrandsS3A2aAgent"
+AGENT_DESCRIPTION = "A Strands Agent exposed via the Agent-to-Agent (A2A) protocol."
+
+# A2AServer.__init__ calls agent_factory once, synchronously, before the lifespan
+# below has run - this is what it reads name/description from at that point.
+# The cast is a lie about runtime shape, not behavior: only .name/.description
+# are ever read off this value.
+_card_placeholder = cast(Agent, SimpleNamespace(name=AGENT_NAME, description=AGENT_DESCRIPTION))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    with with_session_id(
+        get_agent,
+        name=AGENT_NAME,
+        description=AGENT_DESCRIPTION,
+    ) as agent:
+        app.state.agent = agent
+        yield
+
+
+class _SessionIdMiddleware(BaseHTTPMiddleware):
+    """Bind the inbound session (or a fresh UUID) to async context."""
+
+    async def dispatch(self, request: Request, call_next):
+        session_id = request.headers.get(SESSION_ID_HEADER) or str(uuid.uuid4())
+        with session_id_context(session_id):
+            return await call_next(request)
+
+
+app = FastAPI(lifespan=lifespan)
+app.add_middleware(_SessionIdMiddleware)
+
+
+@app.get("/ping")
+def ping() -> dict[str, str]:
+    return {"status": "Healthy"}
+
+
+a2a_server = A2AServer(
+    agent_factory=lambda _context_id: getattr(app.state, "agent", _card_placeholder),
+    port=PORT,
+    http_url=RUNTIME_URL,
+    serve_at_root=True,
+    # Skip tool-registry introspection for the agent card — the per-session
+    # agents aren't constructed yet at startup.
+    skills=[],
+)
+
+app.mount("/", a2a_server.to_fastapi_app())

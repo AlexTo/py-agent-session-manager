@@ -22,12 +22,6 @@ import {
   UserPoolClient,
   UserPoolDomain,
 } from 'aws-cdk-lib/aws-cognito';
-import {
-  CfnLoggingConfiguration,
-  CfnWebACL,
-  CfnWebACLAssociation,
-} from 'aws-cdk-lib/aws-wafv2';
-import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 import { RuntimeConfig } from './runtime-config.js';
 import { Distribution } from 'aws-cdk-lib/aws-cloudfront';
@@ -41,13 +35,11 @@ const LOCAL_CALLBACK_URLS = ['http://localhost:4200', 'http://localhost:4300'];
 
 export interface UserIdentityProps {
   /**
-   * Whether to enable AWS WAFv2 with the default managed ruleset
-   * (AWSManagedRulesCommonRuleSet and AWSManagedRulesKnownBadInputsRuleSet)
-   * and associate it with the user pool.
+   * Whether to require MFA at sign-in.
    *
    * @default true
    */
-  readonly enableWaf?: boolean;
+  readonly requireMfa?: boolean;
 }
 
 /**
@@ -60,26 +52,15 @@ export class UserIdentity extends Construct {
   public readonly userPoolClient: UserPoolClient;
   public readonly userPoolDomain: UserPoolDomain;
 
-  /** The WAFv2 Web ACL associated with the user pool, if WAF is enabled */
-  public readonly webAcl?: CfnWebACL;
-
   constructor(
     scope: Construct,
     id: string,
-    { enableWaf = true }: UserIdentityProps = {},
+    { requireMfa = true }: UserIdentityProps = {},
   ) {
     super(scope, id);
 
     this.region = Stack.of(this).region;
-    this.userPool = this.createUserPool();
-
-    if (enableWaf) {
-      this.webAcl = this.createWebAcl(
-        id,
-        this.userPool,
-        LOCAL_CALLBACK_URLS.length > 0,
-      );
-    }
+    this.userPool = this.createUserPool(requireMfa);
     this.userPoolDomain = this.createUserPoolDomain(this.userPool);
     this.userPoolClient = this.createUserPoolClient(this.userPool);
     this.identityPool = this.createIdentityPool(
@@ -119,9 +100,11 @@ export class UserIdentity extends Construct {
     });
   }
 
-  private createUserPool = () => {
+  private createUserPool = (requireMfa: boolean) => {
     const userPool = new UserPool(this, 'UserPool', {
-      deletionProtection: true,
+      // Dev-friendly: allow the pool to be deleted along with the sandbox stack.
+      deletionProtection: false,
+      removalPolicy: RemovalPolicy.DESTROY,
       passwordPolicy: {
         minLength: 8,
         requireLowercase: true,
@@ -130,11 +113,11 @@ export class UserIdentity extends Construct {
         requireSymbols: true,
         tempPasswordValidity: Duration.days(3),
       },
-      mfa: Mfa.REQUIRED,
+      mfa: requireMfa ? Mfa.REQUIRED : Mfa.OFF,
+      ...(requireMfa ? { mfaSecondFactor: { sms: true, otp: true } } : {}),
       featurePlan: FeaturePlan.PLUS,
       // Audit-only logs threat assessments without blocking sign-in. Switch to FULL_FUNCTION to enforce automatic responses.
       standardThreatProtectionMode: StandardThreatProtectionMode.AUDIT_ONLY,
-      mfaSecondFactor: { sms: true, otp: true },
       signInCaseSensitive: false,
       signInAliases: { username: true, email: true },
       accountRecovery: AccountRecovery.EMAIL_ONLY,
@@ -164,96 +147,6 @@ export class UserIdentity extends Construct {
         poolCfn.cfnOptions.updateReplacePolicy;
     }
     return userPool;
-  };
-
-  private createWebAcl = (
-    id: string,
-    userPool: UserPool,
-    allowsLocalCallback: boolean,
-  ) => {
-    const webAcl = new CfnWebACL(this, 'WebAcl', {
-      defaultAction: { allow: {} },
-      scope: 'REGIONAL',
-      visibilityConfig: {
-        cloudWatchMetricsEnabled: true,
-        metricName: `${id}WebAcl`,
-        sampledRequestsEnabled: true,
-      },
-      rules: [
-        {
-          name: 'CRSRule',
-          priority: 0,
-          statement: {
-            managedRuleGroupStatement: {
-              name: 'AWSManagedRulesCommonRuleSet',
-              vendorName: 'AWS',
-              // EC2MetaDataSSRF_QUERYARGUMENTS treats the loopback redirect_uri the
-              // Hosted UI receives during local sign-in as an SSRF attempt. Counted
-              // only while a local callback URL is allowed; every other rule blocks.
-              ruleActionOverrides: allowsLocalCallback
-                ? [
-                    {
-                      name: 'EC2MetaDataSSRF_QUERYARGUMENTS',
-                      actionToUse: { count: {} },
-                    },
-                  ]
-                : undefined,
-            },
-          },
-          visibilityConfig: {
-            cloudWatchMetricsEnabled: true,
-            metricName: `${id}WebAcl-CRS`,
-            sampledRequestsEnabled: true,
-          },
-          overrideAction: {
-            none: {},
-          },
-        },
-        {
-          name: 'KnownBadInputsRule',
-          priority: 1,
-          statement: {
-            managedRuleGroupStatement: {
-              name: 'AWSManagedRulesKnownBadInputsRuleSet',
-              vendorName: 'AWS',
-            },
-          },
-          visibilityConfig: {
-            cloudWatchMetricsEnabled: true,
-            metricName: `${id}WebAcl-KnownBadInputs`,
-            sampledRequestsEnabled: true,
-          },
-          overrideAction: {
-            none: {},
-          },
-        },
-      ],
-    });
-
-    new CfnWebACLAssociation(this, 'WebAclAssociation', {
-      resourceArn: userPool.userPoolArn,
-      webAclArn: webAcl.attrArn,
-    });
-
-    // Send WAF request logs to CloudWatch. The log group name must start with
-    // `aws-waf-logs-` to satisfy the WAFv2 logging destination requirement.
-    const wafLogGroup = new LogGroup(this, 'WebAclLogs', {
-      logGroupName: `aws-waf-logs-${id}-${this.node.addr.slice(-8)}`,
-      retention: RetentionDays.ONE_MONTH,
-      removalPolicy: RemovalPolicy.DESTROY,
-    });
-    suppressRules(
-      wafLogGroup,
-      ['CKV_AWS_158'],
-      'Using default CloudWatch log encryption for WAF logs',
-    );
-
-    new CfnLoggingConfiguration(this, 'WebAclLoggingConfig', {
-      resourceArn: webAcl.attrArn,
-      logDestinationConfigs: [wafLogGroup.logGroupArn],
-    });
-
-    return webAcl;
   };
 
   private createUserPoolDomain = (userPool: UserPool) =>

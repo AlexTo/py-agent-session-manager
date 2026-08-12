@@ -1,0 +1,23 @@
+import os
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP(
+    name="StrandsS3McpServer",
+    host="0.0.0.0",
+    port=int(os.environ.get("PORT", 8000)),
+    stateless_http=True,
+)
+
+
+@mcp.tool(description="Adds two numbers")
+def add(a: int, b: int) -> int:
+    """Add two numbers"""
+    return a + b
+
+
+@mcp.resource("example://context", description="Sample Guidance")
+def sample_guidance() -> str:
+    return """## Sample Guidance
+
+This is some guidance in markdown format!"""

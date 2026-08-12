@@ -4,6 +4,8 @@ from .app.langchain_a2a_agent_client_langchain import LangchainA2aAgentClientLan
 from .app.langchain_agents_mcp_server_client_langchain import LangchainAgentsMcpServerClientLangChain
 from .app.strands_a2a_agent_client_strands import StrandsA2aAgentClientStrands
 from .app.strands_agents_mcp_server_client_strands import StrandsAgentsMcpServerClientStrands
+from .app.strands_s3_a2a_agent_client_strands import StrandsS3A2aAgentClientStrands
+from .app.strands_s3_mcp_server_client_strands import StrandsS3McpServerClientStrands
 from .core.model_errors_strands import log_model_errors
 from .core.session_context import get_current_session_id, session_id_context
 from .core.tool_errors_strands import log_tool_errors
@@ -19,4 +21,6 @@ __all__ = [
     "LangchainA2aAgentClientLangChain",
     "LangchainAgentsMcpServerClientLangChain",
     "log_tool_errors",
+    "StrandsS3A2aAgentClientStrands",
+    "StrandsS3McpServerClientStrands",
 ]

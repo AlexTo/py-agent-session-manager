@@ -16,7 +16,7 @@ class MetricsAspect implements IAspect {
   visit(node: IConstruct): void {
     if (node instanceof Stack) {
       const id = 'uksb-4wk0bqpg5s';
-      const version = '1.0.0-rc.57';
+      const version = '0.0.0';
       const tags: string[] = [
         'g25',
         'g24',
@@ -28,6 +28,7 @@ class MetricsAspect implements IAspect {
         'g7',
         'g6',
         'g34',
+        'g8',
       ];
       node.templateOptions.description =
         `${node.templateOptions.description ?? ''} (${id}) (version:${version}) (tag:${tags.join(',')})`.trim();

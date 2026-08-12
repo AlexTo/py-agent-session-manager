@@ -1,3 +1,6 @@
+export * from './strands-s3-agui-agent/strands-s3-agui-agent.js';
+export * from './strands-s3-a2a-agent/strands-s3-a2a-agent.js';
+export * from './strands-s3-http-agent/strands-s3-http-agent.js';
 export * from './langchain-agui-agent/langchain-agui-agent.js';
 export * from './langchain-a2a-agent/langchain-a2a-agent.js';
 export * from './langchain-http-agent/langchain-http-agent.js';
