@@ -1,7 +1,5 @@
 import os
 
-from strands.agent.a2a_agent import A2AAgent
-
 from my_py_agents_agent_connection.core.agentcore_a2a_client_strands import (
     AgentCoreA2aClientStrands,
 )
@@ -14,7 +12,7 @@ class StrandsS3A2aAgentClientStrands:
     """Strands client for the StrandsS3A2aAgent A2A agent."""
 
     @staticmethod
-    def create() -> A2AAgent:
+    def create():
         if os.environ.get("LOCAL_DEV") == "true":
             return AgentCoreA2aClientStrands.without_auth("http://localhost:9002/")
         config = get_agentcore_runtime_config()
