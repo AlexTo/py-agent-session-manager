@@ -1,0 +1,112 @@
+import {
+  CopilotChatInput,
+  type CopilotChatInputProps,
+} from '@copilotkit/react-core/v2';
+import { Button } from '@my-py-agents/common-shadcn/components/ui/button';
+import { Textarea } from '@my-py-agents/common-shadcn/components/ui/textarea';
+import { cn } from '@my-py-agents/common-shadcn/lib/utils';
+import { ArrowUp, Square } from 'lucide-react';
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
+
+const MAX_ROWS = 8;
+
+const ShadcnChatInputImpl = ({
+  value,
+  onChange,
+  onSubmitMessage,
+  onStop,
+  isRunning,
+  autoFocus,
+  mode,
+}: CopilotChatInputProps) => {
+  const [internalValue, setInternalValue] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const currentValue = value ?? internalValue;
+  const disabled = mode === 'processing';
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const lineHeight = parseFloat(getComputedStyle(el).lineHeight || '20');
+    el.style.height = `${Math.min(el.scrollHeight, lineHeight * MAX_ROWS)}px`;
+  }, [currentValue]);
+
+  const setValue = (next: string) => {
+    onChange?.(next);
+    if (value === undefined) setInternalValue(next);
+  };
+
+  const submit = () => {
+    const trimmed = currentValue.trim();
+    if (!trimmed) return;
+    onSubmitMessage?.(trimmed);
+    if (value === undefined) setInternalValue('');
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      submit();
+    }
+  };
+
+  return (
+    <div className="px-4 pb-4 pt-2">
+      <div
+        className={cn(
+          'bg-background border-input focus-within:border-ring focus-within:ring-ring/30',
+          'flex items-end gap-2 rounded-3xl border px-3 py-2',
+          'shadow-[0_2px_10px_rgba(0,0,0,0.06)]',
+          'focus-within:ring-4 transition-[border,box-shadow]',
+        )}
+      >
+        <Textarea
+          ref={textareaRef}
+          value={currentValue}
+          onChange={(event) => setValue(event.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          autoFocus={autoFocus}
+          placeholder="Ask me anything..."
+          rows={1}
+          className={cn(
+            'flex-1 resize-none border-0 bg-transparent p-2 shadow-none',
+            'focus-visible:ring-0 focus-visible:ring-offset-0',
+            'min-h-0 max-h-48 leading-6',
+          )}
+        />
+        {isRunning ? (
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon"
+            onClick={onStop}
+            aria-label="Stop"
+            className="size-9 rounded-full"
+          >
+            <Square className="size-4" fill="currentColor" />
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            size="icon"
+            onClick={submit}
+            disabled={disabled || !currentValue.trim()}
+            aria-label="Send message"
+            className="size-9 rounded-full"
+          >
+            <ArrowUp className="size-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export const ShadcnChatInput = Object.assign(
+  ShadcnChatInputImpl,
+  CopilotChatInput,
+);
+
+export default ShadcnChatInput;

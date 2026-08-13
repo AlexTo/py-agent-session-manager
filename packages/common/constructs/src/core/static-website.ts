@@ -6,6 +6,7 @@ import {
   RemovalPolicy,
   Stack,
 } from 'aws-cdk-lib';
+import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   Distribution,
   HeadersFrameOption,
@@ -14,7 +15,6 @@ import {
   SecurityPolicyProtocol,
   ViewerProtocolPolicy,
 } from 'aws-cdk-lib/aws-cloudfront';
-import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import {
   BlockPublicAccess,
@@ -29,8 +29,8 @@ import {
   Source,
 } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
-import { RuntimeConfig } from './runtime-config.js';
 import { suppressRules } from './checkov.js';
+import { RuntimeConfig } from './runtime-config.js';
 
 const DEFAULT_RUNTIME_CONFIG_FILENAME = 'runtime-config.json';
 

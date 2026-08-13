@@ -1,5 +1,5 @@
-import * as url from 'url';
 import { Construct } from 'constructs';
+import * as url from 'url';
 import { StaticWebsite } from '../../core/index.js';
 
 export class StrandsS3Website extends StaticWebsite {

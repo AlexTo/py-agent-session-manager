@@ -1,6 +1,18 @@
 import { Fn, Lazy, Names, RemovalPolicy, Stack } from 'aws-cdk-lib';
-import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+import {
+  AgentRuntimeArtifact,
+  ProtocolType,
+  Runtime,
+  RuntimeProps,
+} from 'aws-cdk-lib/aws-bedrockagentcore';
 import { Connections, IConnectable } from 'aws-cdk-lib/aws-ec2';
+import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+import {
+  Grant,
+  IGrantable,
+  IPrincipal,
+  PolicyStatement,
+} from 'aws-cdk-lib/aws-iam';
 import {
   BlockPublicAccess,
   Bucket,
@@ -9,18 +21,6 @@ import {
 import { Construct } from 'constructs';
 import * as path from 'path';
 import * as url from 'url';
-import {
-  AgentRuntimeArtifact,
-  ProtocolType,
-  Runtime,
-  RuntimeProps,
-} from 'aws-cdk-lib/aws-bedrockagentcore';
-import {
-  PolicyStatement,
-  IGrantable,
-  IPrincipal,
-  Grant,
-} from 'aws-cdk-lib/aws-iam';
 import { suppressRules } from '../../../core/checkov.js';
 import { RuntimeConfig } from '../../../core/runtime-config.js';
 import { findWorkspaceRoot } from '../../../core/workspace.js';

@@ -365,6 +365,67 @@ importers:
         specifier: 'catalog:'
         version: 4.1.10(@types/node@26.2.0)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(jsdom@27.4.0(supports-color@8.1.1))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.4.2)(terser@5.49.1)(tsx@4.23.11)(yaml@2.9.0))
 
+  packages/langchain-s3-infra:
+    dependencies:
+      '@my-py-agents/common-constructs':
+        specifier: workspace:*
+        version: link:../common/constructs
+      aws-cdk-lib:
+        specifier: 'catalog:'
+        version: 2.263.0(constructs@10.8.1)
+      constructs:
+        specifier: 'catalog:'
+        version: 10.8.1
+      source-map-support:
+        specifier: 'catalog:'
+        version: 0.5.21
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+
+  packages/langchain-s3-website:
+    dependencies:
+      '@ag-ui/client':
+        specifier: 'catalog:'
+        version: 0.0.57
+      '@aws-sdk/credential-provider-cognito-identity':
+        specifier: 'catalog:'
+        version: 3.972.66
+      '@copilotkit/react-core':
+        specifier: 'catalog:'
+        version: 1.66.4(@types/mdast@4.0.4)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(graphql@16.14.2)(micromark-util-types@2.0.2)(micromark@4.0.2(supports-color@8.1.1))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@8.1.1)(zod@4.4.3)
+      '@my-py-agents/common-shadcn':
+        specifier: workspace:*
+        version: link:../common/shadcn
+      '@tanstack/react-router':
+        specifier: 'catalog:'
+        version: 1.170.23(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      aws4fetch:
+        specifier: 'catalog:'
+        version: 1.0.20
+      lucide-react:
+        specifier: 'catalog:'
+        version: 1.30.0(react@19.2.8)
+      oidc-client-ts:
+        specifier: 'catalog:'
+        version: 3.5.0
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.8(react@19.2.8)
+      react-oidc-context:
+        specifier: 'catalog:'
+        version: 3.3.1(oidc-client-ts@3.5.0)(react@19.2.8)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
+    devDependencies:
+      '@smithy/types':
+        specifier: 'catalog:'
+        version: 4.16.1
+
   packages/strands-s3-infra:
     dependencies:
       '@my-py-agents/common-constructs':

@@ -1,0 +1,71 @@
+import type { CopilotChatAssistantMessageProps } from '@copilotkit/react-core/v2';
+import {
+  CopilotChatAssistantMessage,
+  CopilotChatToolCallsView,
+} from '@copilotkit/react-core/v2';
+import {
+  Avatar,
+  AvatarFallback,
+} from '@my-py-agents/common-shadcn/components/ui/avatar';
+import { Button } from '@my-py-agents/common-shadcn/components/ui/button';
+import { cn } from '@my-py-agents/common-shadcn/lib/utils';
+import { Copy, Sparkles } from 'lucide-react';
+
+const ShadcnAssistantMessageImpl = ({
+  message,
+  messages,
+}: CopilotChatAssistantMessageProps) => {
+  const hasContent = !!(message.content && message.content.trim().length > 0);
+
+  const handleCopy = () => {
+    if (typeof message.content === 'string') {
+      void navigator.clipboard?.writeText(message.content);
+    }
+  };
+
+  return (
+    <div className="group flex items-start gap-3 py-2">
+      <Avatar className="bg-primary/10 border-primary/20 mt-0.5 border">
+        <AvatarFallback className="bg-transparent">
+          <Sparkles className="text-primary size-4" />
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <div
+          className={cn(
+            'bg-muted/60 text-foreground rounded-2xl rounded-tl-sm px-4 py-3',
+            'copilotkit-shadcn-markdown',
+          )}
+        >
+          <CopilotChatAssistantMessage.MarkdownRenderer
+            content={message.content ?? ''}
+          />
+        </div>
+        {message.toolCalls && message.toolCalls.length > 0 && (
+          <CopilotChatToolCallsView message={message} messages={messages} />
+        )}
+        {hasContent && (
+          <div className="text-muted-foreground flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7"
+              aria-label="Copy message"
+              onClick={handleCopy}
+            >
+              <Copy className="size-3.5" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export const ShadcnAssistantMessage = Object.assign(
+  ShadcnAssistantMessageImpl,
+  CopilotChatAssistantMessage,
+);
+
+export default ShadcnAssistantMessage;

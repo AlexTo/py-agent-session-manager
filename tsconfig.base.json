@@ -40,6 +40,12 @@
       ],
       "@my-py-agents/strands-s3-infra": [
         "./packages/strands-s3-infra/src/index.ts"
+      ],
+      "@my-py-agents/langchain-s3-website": [
+        "./packages/langchain-s3-website/src/index.ts"
+      ],
+      "@my-py-agents/langchain-s3-infra": [
+        "./packages/langchain-s3-infra/src/index.ts"
       ]
     }
   }

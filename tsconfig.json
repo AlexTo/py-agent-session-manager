@@ -17,6 +17,12 @@
     },
     {
       "path": "./packages/strands-s3-infra"
+    },
+    {
+      "path": "./packages/langchain-s3-website"
+    },
+    {
+      "path": "./packages/langchain-s3-infra"
     }
   ]
 }

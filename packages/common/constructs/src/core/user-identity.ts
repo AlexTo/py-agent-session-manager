@@ -1,8 +1,4 @@
 import {
-  IdentityPool,
-  UserPoolAuthenticationProvider,
-} from 'aws-cdk-lib/aws-cognito-identitypool';
-import {
   CfnOutput,
   CfnResource,
   Duration,
@@ -10,6 +6,7 @@ import {
   RemovalPolicy,
   Stack,
 } from 'aws-cdk-lib';
+import { Distribution } from 'aws-cdk-lib/aws-cloudfront';
 import {
   AccountRecovery,
   CfnManagedLoginBranding,
@@ -22,11 +19,14 @@ import {
   UserPoolClient,
   UserPoolDomain,
 } from 'aws-cdk-lib/aws-cognito';
+import {
+  IdentityPool,
+  UserPoolAuthenticationProvider,
+} from 'aws-cdk-lib/aws-cognito-identitypool';
 import { Construct } from 'constructs';
-import { RuntimeConfig } from './runtime-config.js';
-import { Distribution } from 'aws-cdk-lib/aws-cloudfront';
-import { findCloudFrontDomainNames } from './cloudfront.js';
 import { suppressRules } from './checkov.js';
+import { findCloudFrontDomainNames } from './cloudfront.js';
+import { RuntimeConfig } from './runtime-config.js';
 
 const WEB_CLIENT_ID = 'WebClient';
 

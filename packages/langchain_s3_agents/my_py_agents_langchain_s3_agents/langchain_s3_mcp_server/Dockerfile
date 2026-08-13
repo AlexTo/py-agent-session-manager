@@ -1,0 +1,21 @@
+FROM public.ecr.aws/docker/library/python:3.14-slim
+
+# Remove the base image's pip: the server runs from the bundled environment and
+# never needs it at runtime, and pip's vendored packages carry known
+# HIGH/CRITICAL vulnerabilities flagged by the image scan.
+RUN python -m pip uninstall -y pip && \
+    rm -rf /usr/local/lib/python*/site-packages/pip \
+           /usr/local/lib/python*/site-packages/pip-*.dist-info
+
+WORKDIR /app
+
+# Copy bundled package
+COPY . /app
+
+EXPOSE 8000
+
+ENV PYTHONPATH=/app
+
+# Auto-instrument with AWS Distro for OpenTelemetry
+# https://aws-otel.github.io/docs/getting-started/python-sdk/auto-instr
+CMD ["python", "bin/opentelemetry-instrument", "python", "-m", "uvicorn", "my_py_agents_langchain_s3_agents.langchain_s3_mcp_server.http:app", "--host", "0.0.0.0", "--port", "8000"]

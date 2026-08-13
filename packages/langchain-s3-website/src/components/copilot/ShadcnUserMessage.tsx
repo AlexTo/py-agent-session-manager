@@ -1,0 +1,49 @@
+import type {
+  CopilotChatUserMessageProps,
+  UserMessage,
+} from '@copilotkit/react-core/v2';
+import { CopilotChatUserMessage } from '@copilotkit/react-core/v2';
+import {
+  Avatar,
+  AvatarFallback,
+} from '@my-py-agents/common-shadcn/components/ui/avatar';
+import { User } from 'lucide-react';
+
+const flattenContent = (content: UserMessage['content']): string => {
+  if (!content) return '';
+  if (typeof content === 'string') return content;
+  return content
+    .filter(
+      (part): part is { type: 'text'; text: string } =>
+        !!part &&
+        typeof part === 'object' &&
+        'type' in part &&
+        (part as { type?: unknown }).type === 'text' &&
+        'text' in part &&
+        typeof (part as { text?: unknown }).text === 'string',
+    )
+    .map((part) => part.text)
+    .join('\n');
+};
+
+const ShadcnUserMessageImpl = ({ message }: CopilotChatUserMessageProps) => (
+  <div className="flex items-start justify-end gap-3 py-2">
+    <div className="flex min-w-0 max-w-[85%] flex-col items-end gap-1.5">
+      <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 whitespace-pre-wrap break-words">
+        {flattenContent(message.content)}
+      </div>
+    </div>
+    <Avatar className="bg-secondary mt-0.5">
+      <AvatarFallback className="bg-transparent">
+        <User className="text-secondary-foreground size-4" />
+      </AvatarFallback>
+    </Avatar>
+  </div>
+);
+
+export const ShadcnUserMessage = Object.assign(
+  ShadcnUserMessageImpl,
+  CopilotChatUserMessage,
+);
+
+export default ShadcnUserMessage;

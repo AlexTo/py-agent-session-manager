@@ -1,21 +1,21 @@
 import { Fn, Lazy, Names, Stack } from 'aws-cdk-lib';
-import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
-import { Connections, IConnectable } from 'aws-cdk-lib/aws-ec2';
-import { Construct } from 'constructs';
-import * as path from 'path';
-import * as url from 'url';
 import {
   AgentRuntimeArtifact,
   ProtocolType,
   Runtime,
   RuntimeProps,
 } from 'aws-cdk-lib/aws-bedrockagentcore';
+import { Connections, IConnectable } from 'aws-cdk-lib/aws-ec2';
+import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 import {
-  PolicyStatement,
+  Grant,
   IGrantable,
   IPrincipal,
-  Grant,
+  PolicyStatement,
 } from 'aws-cdk-lib/aws-iam';
+import { Construct } from 'constructs';
+import * as path from 'path';
+import * as url from 'url';
 import { RuntimeConfig } from '../../../core/runtime-config.js';
 import { findWorkspaceRoot } from '../../../core/workspace.js';
 
