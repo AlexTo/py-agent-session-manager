@@ -1,0 +1,23 @@
+import { CopilotChatMessageView } from '@copilotkit/react-core/v2';
+import { cn } from '@my-py-agents/common-shadcn/lib/utils';
+
+export const ShadcnCursor: typeof CopilotChatMessageView.Cursor = () => (
+  <div
+    role="status"
+    aria-label="Generating response"
+    className="flex items-center gap-1 px-4 py-2"
+  >
+    {[0, 1, 2].map((i) => (
+      <span
+        key={i}
+        className={cn(
+          'bg-muted-foreground/60 size-1.5 rounded-full',
+          'animate-bounce',
+        )}
+        style={{ animationDelay: `${i * 120}ms` }}
+      />
+    ))}
+  </div>
+);
+
+export default ShadcnCursor;

@@ -19,7 +19,9 @@
         "my_py_agents.strands_s3_agents:build",
         "@my-py-agents/strands-s3-website:build",
         "my_py_agents.langchain_s3_agents:build",
-        "@my-py-agents/langchain-s3-website:build"
+        "@my-py-agents/langchain-s3-website:build",
+        "my_py_agents.langchain_dynamodb_agents:build",
+        "@my-py-agents/langchain-dynamodb-website:build"
       ]
     },
     "compile": {

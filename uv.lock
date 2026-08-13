@@ -6,6 +6,7 @@ requires-python = ">=3.14"
 members = [
     "my-py-agents-agent-connection",
     "my-py-agents-langchain-agents",
+    "my-py-agents-langchain-dynamodb-agents",
     "my-py-agents-langchain-s3-agents",
     "my-py-agents-strands-agents",
     "my-py-agents-strands-s3-agents",
@@ -1228,6 +1229,20 @@ wheels = [
 ]
 
 [[package]]
+name = "langgraph-checkpoint-aws"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "boto3" },
+    { name = "langgraph" },
+    { name = "langgraph-checkpoint" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/21/78/272c3fa062eb0fc6f2b23fe49100b6e419a84a807ed62412a578a8f3f60a/langgraph_checkpoint_aws-1.2.0.tar.gz", hash = "sha256:ba9070335eee056452d6a1608ae45ceca9c7b95f83901eafaa43e26c56c9abe3", size = 305525, upload-time = "2026-07-02T20:41:10.361Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/37/8c/a3f43da031c4eeb497a4e83d9d5a243e11ff544e17a56017cdbcae1c4c23/langgraph_checkpoint_aws-1.2.0-py3-none-any.whl", hash = "sha256:a8868d908546832cbfafc460e66b0528606692fb6df6838aa60641c0a17ce269", size = 168149, upload-time = "2026-07-02T20:41:09.082Z" },
+]
+
+[[package]]
 name = "langgraph-checkpoint-sqlite"
 version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1514,6 +1529,59 @@ requires-dist = [
 dev = [{ name = "fastapi", extras = ["standard"], specifier = "==0.141.1" }]
 
 [[package]]
+name = "my-py-agents-langchain-dynamodb-agents"
+version = "1.0.0"
+source = { editable = "packages/langchain_dynamodb_agents" }
+dependencies = [
+    { name = "a2a-sdk" },
+    { name = "ag-ui-langgraph" },
+    { name = "ag-ui-protocol" },
+    { name = "aiosqlite" },
+    { name = "aws-lambda-powertools" },
+    { name = "aws-opentelemetry-distro" },
+    { name = "bedrock-agentcore" },
+    { name = "boto3" },
+    { name = "fastapi" },
+    { name = "langchain" },
+    { name = "langchain-aws" },
+    { name = "langgraph" },
+    { name = "langgraph-checkpoint-aws" },
+    { name = "langgraph-checkpoint-sqlite" },
+    { name = "mcp" },
+    { name = "my-py-agents-agent-connection" },
+    { name = "uvicorn" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "fastapi", extra = ["standard"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "a2a-sdk", specifier = "==0.3.26" },
+    { name = "ag-ui-langgraph", specifier = "==0.0.42" },
+    { name = "ag-ui-protocol", specifier = "==0.1.19" },
+    { name = "aiosqlite", specifier = "==0.22.1" },
+    { name = "aws-lambda-powertools", specifier = "==3.31.1" },
+    { name = "aws-opentelemetry-distro", specifier = "==0.19.0" },
+    { name = "bedrock-agentcore", specifier = "==1.21.0" },
+    { name = "boto3", specifier = "==1.43.67" },
+    { name = "fastapi", specifier = "==0.141.1" },
+    { name = "langchain", specifier = "==1.3.14" },
+    { name = "langchain-aws", specifier = "==1.7.0" },
+    { name = "langgraph", specifier = "==1.2.10" },
+    { name = "langgraph-checkpoint-aws", specifier = "==1.2.0" },
+    { name = "langgraph-checkpoint-sqlite", specifier = "==3.1.1" },
+    { name = "mcp", specifier = "==1.28.1" },
+    { name = "my-py-agents-agent-connection", editable = "packages/common/agent_connection" },
+    { name = "uvicorn", specifier = "==0.52.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "fastapi", extras = ["standard"], specifier = "==0.141.1" }]
+
+[[package]]
 name = "my-py-agents-langchain-s3-agents"
 version = "1.0.0"
 source = { editable = "packages/langchain_s3_agents" }
@@ -1688,6 +1756,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "my-py-agents-agent-connection" },
     { name = "my-py-agents-langchain-agents" },
+    { name = "my-py-agents-langchain-dynamodb-agents" },
     { name = "my-py-agents-langchain-s3-agents" },
     { name = "my-py-agents-strands-agents" },
     { name = "my-py-agents-strands-s3-agents" },
@@ -1708,6 +1777,7 @@ dev = [
 requires-dist = [
     { name = "my-py-agents-agent-connection", editable = "packages/common/agent_connection" },
     { name = "my-py-agents-langchain-agents", editable = "packages/langchain_agents" },
+    { name = "my-py-agents-langchain-dynamodb-agents", editable = "packages/langchain_dynamodb_agents" },
     { name = "my-py-agents-langchain-s3-agents", editable = "packages/langchain_s3_agents" },
     { name = "my-py-agents-strands-agents", editable = "packages/strands_agents" },
     { name = "my-py-agents-strands-s3-agents", editable = "packages/strands_s3_agents" },

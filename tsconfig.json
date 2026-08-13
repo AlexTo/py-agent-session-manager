@@ -23,6 +23,12 @@
     },
     {
       "path": "./packages/langchain-s3-infra"
+    },
+    {
+      "path": "./packages/langchain-dynamodb-website"
+    },
+    {
+      "path": "./packages/langchain-dynamodb-infra"
     }
   ]
 }

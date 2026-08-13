@@ -1,0 +1,601 @@
+{
+  "name": "my_py_agents.langchain_dynamodb_agents",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "packages/langchain_dynamodb_agents/my_py_agents_langchain_dynamodb_agents",
+  "release": {
+    "version": {
+      "versionActions": "@nxlv/python/release/version-actions"
+    }
+  },
+  "tags": [],
+  "metadata": {
+    "generator": "py#project",
+    "ports": [8089, 9004, 8090, 8004],
+    "components": [
+      {
+        "generator": "py#agent",
+        "path": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_http_agent",
+        "name": "langchain-dynamodb-http-agent",
+        "port": 8089,
+        "rc": "LangchainDynamodbHttpAgent",
+        "auth": "iam",
+        "protocol": "http",
+        "framework": "langchain",
+        "session": "dynamodb-s3",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#agent",
+        "path": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_a2a_agent",
+        "name": "langchain-dynamodb-a2a-agent",
+        "port": 9004,
+        "rc": "LangchainDynamodbA2aAgent",
+        "auth": "iam",
+        "protocol": "a2a",
+        "framework": "langchain",
+        "session": "dynamodb-s3",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#agent",
+        "path": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_agui_agent",
+        "name": "langchain-dynamodb-agui-agent",
+        "port": 8090,
+        "rc": "LangchainDynamodbAguiAgent",
+        "auth": "iam",
+        "protocol": "ag-ui",
+        "framework": "langchain",
+        "session": "dynamodb-s3",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#mcp-server",
+        "path": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_mcp_server",
+        "name": "langchain-dynamodb-mcp-server",
+        "port": 8004,
+        "rc": "LangchainDynamodbMcpServer",
+        "auth": "iam",
+        "iac": "cdk"
+      },
+      {
+        "generator": "py#agent#a2a-connection",
+        "path": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_agui_agent/agent.py",
+        "name": "LangchainDynamodbA2aAgent",
+        "framework": "langchain",
+        "sourcePath": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_agui_agent"
+      },
+      {
+        "generator": "py#agent#mcp-connection",
+        "path": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_http_agent/agent.py",
+        "name": "LangchainDynamodbMcpServer",
+        "framework": "langchain",
+        "sourcePath": "my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_http_agent"
+      }
+    ]
+  },
+  "targets": {
+    "add": {
+      "executor": "@nxlv/python:add",
+      "options": {}
+    },
+    "build": {
+      "dependsOn": ["lint", "compile", "test", "typecheck", "bundle", "docker"],
+      "inputs": ["default", "^production"],
+      "options": {
+        "outputPath": "{workspaceRoot}/dist/{projectRoot}"
+      }
+    },
+    "bundle": {
+      "dependsOn": ["bundle-arm"]
+    },
+    "bundle-arm": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["compile"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/bundle-arm"],
+      "options": {
+        "commands": [
+          "uv export --frozen --no-dev --no-editable --project {projectRoot} --package my_py_agents.langchain_dynamodb_agents -o dist/{projectRoot}/bundle-arm/requirements.txt",
+          "uv pip install -n --no-deps --no-installer-metadata --no-compile-bytecode --python-platform aarch64-manylinux_2_28 --target dist/{projectRoot}/bundle-arm -r dist/{projectRoot}/bundle-arm/requirements.txt"
+        ],
+        "parallel": false
+      }
+    },
+    "compile": {
+      "executor": "@nxlv/python:build",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/build"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "options": {
+        "outputPath": "{workspaceRoot}/dist/{projectRoot}/build",
+        "publish": false,
+        "lockedVersions": true,
+        "bundleLocalDependencies": true,
+        "ignorePaths": [
+          ".venv",
+          ".tox",
+          "tests",
+          "__pycache__",
+          ".coverage",
+          ".coverage.*",
+          ".pytest_cache",
+          "pytest-cache-files-*",
+          ".ruff_cache"
+        ]
+      }
+    },
+    "dev": {
+      "dependsOn": [
+        "langchain-dynamodb-http-agent-dev",
+        "langchain-dynamodb-a2a-agent-dev",
+        "langchain-dynamodb-agui-agent-dev",
+        "langchain-dynamodb-mcp-server-dev"
+      ],
+      "continuous": true
+    },
+    "docker": {
+      "dependsOn": [
+        "langchain-dynamodb-http-agent-docker",
+        "langchain-dynamodb-a2a-agent-docker",
+        "langchain-dynamodb-agui-agent-docker",
+        "langchain-dynamodb-mcp-server-docker"
+      ]
+    },
+    "format": {
+      "executor": "@nxlv/python:ruff-format",
+      "outputs": [],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "options": {
+        "filePatterns": ["my_py_agents_langchain_dynamodb_agents", "tests"],
+        "check": true
+      },
+      "configurations": {
+        "fix": {
+          "check": false
+        },
+        "skip-lint": {
+          "check": false
+        }
+      }
+    },
+    "install": {
+      "executor": "@nxlv/python:install",
+      "options": {
+        "silent": false,
+        "args": "",
+        "verbose": false,
+        "debug": false
+      }
+    },
+    "langchain-dynamodb-a2a-agent-chat": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["tsx ./scripts/langchain-dynamodb-a2a-agent/chat.ts"],
+        "cwd": "{projectRoot}",
+        "env": {
+          "URL": "http://localhost:9004"
+        }
+      }
+    },
+    "langchain-dynamodb-a2a-agent-dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["my_py_agents.langchain_dynamodb_agents"],
+          "target": "langchain-dynamodb-mcp-server-dev"
+        }
+      ],
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_a2a_agent/main.py --port 9004"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "9004",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "langchain-dynamodb-a2a-agent-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-a2a-agent",
+          "make-dir dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-a2a-agent",
+          "ncp dist/packages/langchain_dynamodb_agents/bundle-arm dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-a2a-agent",
+          "ncp packages/langchain_dynamodb_agents/my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_a2a_agent/Dockerfile dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-a2a-agent/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-langchain-dynamodb-a2a-agent:latest dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-a2a-agent"
+        ],
+        "parallel": false
+      }
+    },
+    "langchain-dynamodb-a2a-agent-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_a2a_agent/main.py --port 9004"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "9004"
+        }
+      }
+    },
+    "langchain-dynamodb-a2a-agent-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-a2a-agent-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["langchain-dynamodb-a2a-agent-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-a2a-agent-latest",
+          "make-dir dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-a2a-agent-latest",
+          "ncp packages/langchain_dynamodb_agents/.trivyignore dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-a2a-agent-latest/.trivyignore",
+          "docker save -o dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-a2a-agent-latest/image-0.tar my-py-agents-langchain-dynamodb-a2a-agent:latest",
+          "docker run --rm -v \"./dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-a2a-agent-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "langchain-dynamodb-agui-agent-chat": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["tsx ./scripts/langchain-dynamodb-agui-agent/chat.ts"],
+        "cwd": "{projectRoot}",
+        "env": {
+          "URL": "http://localhost:8090/invocations"
+        }
+      }
+    },
+    "langchain-dynamodb-agui-agent-dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["my_py_agents.langchain_dynamodb_agents"],
+          "target": "langchain-dynamodb-a2a-agent-dev"
+        },
+        {
+          "projects": ["my_py_agents.langchain_dynamodb_agents"],
+          "target": "langchain-dynamodb-mcp-server-dev"
+        }
+      ],
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_agui_agent/main.py --port 8090"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8090",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "langchain-dynamodb-agui-agent-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-agui-agent",
+          "make-dir dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-agui-agent",
+          "ncp dist/packages/langchain_dynamodb_agents/bundle-arm dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-agui-agent",
+          "ncp packages/langchain_dynamodb_agents/my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_agui_agent/Dockerfile dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-agui-agent/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-langchain-dynamodb-agui-agent:latest dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-agui-agent"
+        ],
+        "parallel": false
+      }
+    },
+    "langchain-dynamodb-agui-agent-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_agui_agent/main.py --port 8090"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8090"
+        }
+      }
+    },
+    "langchain-dynamodb-agui-agent-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-agui-agent-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["langchain-dynamodb-agui-agent-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-agui-agent-latest",
+          "make-dir dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-agui-agent-latest",
+          "ncp packages/langchain_dynamodb_agents/.trivyignore dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-agui-agent-latest/.trivyignore",
+          "docker save -o dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-agui-agent-latest/image-0.tar my-py-agents-langchain-dynamodb-agui-agent:latest",
+          "docker run --rm -v \"./dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-agui-agent-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "langchain-dynamodb-http-agent-chat": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["langchain-dynamodb-http-agent-generate-client"],
+      "options": {
+        "commands": ["tsx ./scripts/langchain-dynamodb-http-agent/chat.ts"],
+        "cwd": "{projectRoot}",
+        "env": {
+          "URL": "http://localhost:8089"
+        }
+      }
+    },
+    "langchain-dynamodb-http-agent-dev": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["my_py_agents.langchain_dynamodb_agents"],
+          "target": "langchain-dynamodb-a2a-agent-dev"
+        },
+        {
+          "projects": ["my_py_agents.langchain_dynamodb_agents"],
+          "target": "langchain-dynamodb-mcp-server-dev"
+        }
+      ],
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_http_agent/main.py --port 8089"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8089",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "langchain-dynamodb-http-agent-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-http-agent",
+          "make-dir dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-http-agent",
+          "ncp dist/packages/langchain_dynamodb_agents/bundle-arm dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-http-agent",
+          "ncp packages/langchain_dynamodb_agents/my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_http_agent/Dockerfile dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-http-agent/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-langchain-dynamodb-http-agent:latest dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-http-agent"
+        ],
+        "parallel": false
+      }
+    },
+    "langchain-dynamodb-http-agent-generate-client": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["langchain-dynamodb-http-agent-openapi"],
+      "inputs": [
+        {
+          "dependentTasksOutputFiles": "**/*.json"
+        }
+      ],
+      "outputs": [
+        "{projectRoot}/scripts/langchain-dynamodb-http-agent/generated"
+      ],
+      "options": {
+        "commands": [
+          "nx g @aws/nx-plugin:open-api#ts-client --openApiSpecPath=\"dist/packages/langchain_dynamodb_agents/openapi/langchain_dynamodb_http_agent/openapi.json\" --outputPath=\"packages/langchain_dynamodb_agents/scripts/langchain-dynamodb-http-agent/generated\" --no-interactive"
+        ]
+      }
+    },
+    "langchain-dynamodb-http-agent-openapi": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/dist/{projectRoot}/openapi/langchain_dynamodb_http_agent"
+      ],
+      "options": {
+        "commands": [
+          "uv run python {projectRoot}/scripts/langchain_dynamodb_http_agent_openapi.py \"dist/{projectRoot}/openapi/langchain_dynamodb_http_agent/openapi.json\""
+        ]
+      }
+    },
+    "langchain-dynamodb-http-agent-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run fastapi dev my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_http_agent/main.py --port 8089"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8089"
+        }
+      }
+    },
+    "langchain-dynamodb-http-agent-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-http-agent-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["langchain-dynamodb-http-agent-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-http-agent-latest",
+          "make-dir dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-http-agent-latest",
+          "ncp packages/langchain_dynamodb_agents/.trivyignore dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-http-agent-latest/.trivyignore",
+          "docker save -o dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-http-agent-latest/image-0.tar my-py-agents-langchain-dynamodb-http-agent:latest",
+          "docker run --rm -v \"./dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-http-agent-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "@nxlv/python:ruff-check",
+      "dependsOn": ["format"],
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [],
+      "options": {
+        "lintFilePatterns": ["my_py_agents_langchain_dynamodb_agents", "tests"]
+      },
+      "configurations": {
+        "fix": {
+          "fix": true
+        },
+        "skip-lint": {
+          "exitZero": true
+        }
+      }
+    },
+    "lock": {
+      "executor": "@nxlv/python:lock",
+      "options": {
+        "update": false
+      }
+    },
+    "remove": {
+      "executor": "@nxlv/python:remove",
+      "options": {}
+    },
+    "sync": {
+      "executor": "@nxlv/python:sync",
+      "options": {}
+    },
+    "test": {
+      "executor": "@nxlv/python:run-commands",
+      "outputs": [
+        "{workspaceRoot}/reports/{projectRoot}/unittests",
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "cache": true,
+      "options": {
+        "command": "uv run pytest tests/",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "trivy": {
+      "dependsOn": [
+        "langchain-dynamodb-http-agent-trivy",
+        "langchain-dynamodb-a2a-agent-trivy",
+        "langchain-dynamodb-agui-agent-trivy",
+        "langchain-dynamodb-mcp-server-trivy"
+      ]
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "executor": "@nxlv/python:run-commands",
+      "options": {
+        "command": "uv run ty check",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "update": {
+      "executor": "@nxlv/python:update",
+      "options": {}
+    },
+    "langchain-dynamodb-mcp-server-docker": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["bundle-arm"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-mcp-server",
+          "make-dir dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-mcp-server",
+          "ncp dist/packages/langchain_dynamodb_agents/bundle-arm dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-mcp-server",
+          "ncp packages/langchain_dynamodb_agents/my_py_agents_langchain_dynamodb_agents/langchain_dynamodb_mcp_server/Dockerfile dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-mcp-server/Dockerfile",
+          "docker build --platform linux/arm64 -t my-py-agents-langchain-dynamodb-mcp-server:latest dist/packages/langchain_dynamodb_agents/docker/langchain-dynamodb-mcp-server"
+        ],
+        "parallel": false
+      }
+    },
+    "langchain-dynamodb-mcp-server-trivy": {
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "outputs": [
+        "{workspaceRoot}/dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-mcp-server-latest"
+      ],
+      "executor": "nx:run-commands",
+      "dependsOn": ["langchain-dynamodb-mcp-server-docker"],
+      "options": {
+        "commands": [
+          "rimraf dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-mcp-server-latest",
+          "make-dir dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-mcp-server-latest",
+          "ncp packages/langchain_dynamodb_agents/.trivyignore dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-mcp-server-latest/.trivyignore",
+          "docker save -o dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-mcp-server-latest/image-0.tar my-py-agents-langchain-dynamodb-mcp-server:latest",
+          "docker run --rm -v \"./dist/packages/langchain_dynamodb_agents/trivy/my-py-agents-langchain-dynamodb-mcp-server-latest\":/scan public.ecr.aws/aquasecurity/trivy:0.72.0 image --input /scan/image-0.tar --ignorefile /scan/.trivyignore --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress -q"
+        ],
+        "parallel": false
+      }
+    },
+    "langchain-dynamodb-mcp-server-serve-stdio": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run -m my_py_agents_langchain_dynamodb_agents.langchain_dynamodb_mcp_server.stdio"
+        ],
+        "cwd": "{projectRoot}"
+      }
+    },
+    "langchain-dynamodb-mcp-server-serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run uvicorn --reload my_py_agents_langchain_dynamodb_agents.langchain_dynamodb_mcp_server.http:app --host 0.0.0.0 --port 8004"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8004"
+        }
+      }
+    },
+    "langchain-dynamodb-mcp-server-dev": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "uv run uvicorn --reload my_py_agents_langchain_dynamodb_agents.langchain_dynamodb_mcp_server.http:app --host 0.0.0.0 --port 8004"
+        ],
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "8004",
+          "LOCAL_DEV": "true"
+        }
+      }
+    },
+    "langchain-dynamodb-mcp-server-inspect": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "dependsOn": ["langchain-dynamodb-mcp-server-dev"],
+      "options": {
+        "commands": [
+          "mcp-inspector --transport http --server-url http://localhost:8004/mcp"
+        ],
+        "cwd": "{projectRoot}"
+      }
+    },
+    "langchain-dynamodb-mcp-server-inspect-stdio": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "mcp-inspector -- uv run -m my_py_agents_langchain_dynamodb_agents.langchain_dynamodb_mcp_server.stdio"
+        ],
+        "cwd": "{projectRoot}"
+      }
+    }
+  }
+}

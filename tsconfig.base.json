@@ -46,6 +46,12 @@
       ],
       "@my-py-agents/langchain-s3-infra": [
         "./packages/langchain-s3-infra/src/index.ts"
+      ],
+      "@my-py-agents/langchain-dynamodb-website": [
+        "./packages/langchain-dynamodb-website/src/index.ts"
+      ],
+      "@my-py-agents/langchain-dynamodb-infra": [
+        "./packages/langchain-dynamodb-infra/src/index.ts"
       ]
     }
   }

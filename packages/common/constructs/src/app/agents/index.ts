@@ -1,3 +1,6 @@
+export * from './langchain-dynamodb-agui-agent/langchain-dynamodb-agui-agent.js';
+export * from './langchain-dynamodb-a2a-agent/langchain-dynamodb-a2a-agent.js';
+export * from './langchain-dynamodb-http-agent/langchain-dynamodb-http-agent.js';
 export * from './langchain-a2a-agent/langchain-a2a-agent.js';
 export * from './langchain-agui-agent/langchain-agui-agent.js';
 export * from './langchain-http-agent/langchain-http-agent.js';

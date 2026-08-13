@@ -4,6 +4,7 @@ version = "1.0.0"
 dependencies = [
   "my-py-agents-agent-connection",
   "my-py-agents-langchain-agents",
+  "my-py-agents-langchain-dynamodb-agents",
   "my-py-agents-langchain-s3-agents",
   "my-py-agents-strands-agents",
   "my-py-agents-strands-s3-agents"
@@ -13,6 +14,7 @@ dependencies = [
 members = [
   "packages/common/agent_connection",
   "packages/langchain_agents",
+  "packages/langchain_dynamodb_agents",
   "packages/langchain_s3_agents",
   "packages/strands_agents",
   "packages/strands_s3_agents"
@@ -22,6 +24,9 @@ members = [
 workspace = true
 
 [tool.uv.sources.my-py-agents-langchain-agents]
+workspace = true
+
+[tool.uv.sources.my-py-agents-langchain-dynamodb-agents]
 workspace = true
 
 [tool.uv.sources.my-py-agents-langchain-s3-agents]

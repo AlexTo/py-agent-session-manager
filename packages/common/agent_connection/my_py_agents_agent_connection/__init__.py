@@ -2,6 +2,8 @@
 
 from .app.langchain_a2a_agent_client_langchain import LangchainA2aAgentClientLangChain
 from .app.langchain_agents_mcp_server_client_langchain import LangchainAgentsMcpServerClientLangChain
+from .app.langchain_dynamodb_a2a_agent_client_langchain import LangchainDynamodbA2aAgentClientLangChain
+from .app.langchain_dynamodb_mcp_server_client_langchain import LangchainDynamodbMcpServerClientLangChain
 from .app.langchain_s3_a2a_agent_client_langchain import LangchainS3A2aAgentClientLangChain
 from .app.langchain_s3_mcp_server_client_langchain import LangchainS3McpServerClientLangChain
 from .app.strands_a2a_agent_client_strands import StrandsA2aAgentClientStrands
@@ -27,4 +29,6 @@ __all__ = [
     "StrandsS3McpServerClientStrands",
     "LangchainS3A2aAgentClientLangChain",
     "LangchainS3McpServerClientLangChain",
+    "LangchainDynamodbA2aAgentClientLangChain",
+    "LangchainDynamodbMcpServerClientLangChain",
 ]
