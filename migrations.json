@@ -3,10 +3,10 @@
     {
       "cli": "nx",
       "package": "@aws/nx-plugin",
-      "name": "latest-py-agent-a2a-httpx-client-per-call",
+      "name": "latest-py-agent-session-id-middleware-extraction",
       "version": "999.0.0",
-      "description": "0001-py-agent-lifespan-construction",
-      "implementation": "./src/migrations/latest/py-agent-a2a-httpx-client-per-call/migration"
+      "description": "Extract the duplicated _SessionIdMiddleware class in py#agent's main.py into a shared middleware/session_id_middleware.py module",
+      "implementation": "./src/migrations/latest/py-agent-session-id-middleware-extraction/migration"
     }
   ]
 }
